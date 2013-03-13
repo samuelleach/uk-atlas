@@ -44,7 +44,7 @@ topo/uk.json: topo/subunits.json topo/places.json
 	mkdir -p $(dir $@)
 	topojson \
 		--id-property su_a3 \
-		-p NAME=name \
+		-p name=NAME \
 		-p name \
 		-o topo/uk.json \
 		topo/subunits.json \
