@@ -1,4 +1,4 @@
-This Makefile currently pœroduces the uk.json topojson file demonstrated in Mike Bostock's d3
+This Makefile currently produces the uk.json topojson file demonstrated in Mike Bostock's d3
 tutorial http://bost.ocks.org/mike/map/
 
 I'm interested to include data with other UK boundaries such as
