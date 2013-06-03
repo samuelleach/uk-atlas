@@ -1,12 +1,18 @@
 # This is a Makefile for producing the uk.json topojson file used in
 # Mike Bostock's tutorial "Let's make a map" http://bost.ocks.org/mike/map/
 
-NATURALEARTH=http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural
+# 3 June 2013: Now includes processing of Office of National
+#              Statistics 2011 Ward boundaries. Thanks to John Nance
+#              for help with ogr2ogr.
 
-all: topo/uk.json
+NATURALEARTH=http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural
+ONS=http://data.statistics.gov.uk/ONSGeography/CensusGeography/Boundaries/2011
+
+all: topo/uk.json \
+	topo/ukwards.topo.json
 
 clean:
-	rm -rf gz shp topo
+	rm -rf gz shp topo ons
 
 tidy:
 	rm -rf *.README.html *.VERSION.txt *.prj
@@ -49,3 +55,30 @@ topo/uk.json: topo/subunits.json topo/places.json
 		-o topo/uk.json \
 		topo/subunits.json \
 		topo/places.json
+
+ons/WD_DEC_2011_EW_BGC_shp.zip: 
+	mkdir -p $(dir $@) && wget $(ONS)/Wards/$(notdir $@) -O $@.download && mv $@.download $@
+
+shp/ons/WD_DEC_2011_EW_BGC.shp: ons/WD_DEC_2011_EW_BGC_shp.zip
+	mkdir -p $(dir $@) && unzip $< -d $(dir $@)
+	touch $@
+
+topo/ukwards.json: shp/ons/WD_DEC_2011_EW_BGC.shp
+	mkdir -p $(dir $@)
+	cd shp/ons; \
+	ogr2ogr \
+		-t_srs "EPSG:4326" \
+		-f GEOJSON \
+		ukwards.json \
+		WD_DEC_2011_EW_BGC.shp; \
+	mv $(notdir $@) ../../$@
+
+topo/ukwards.topo.json: topo/ukwards.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o topo/ukwards.topo.json \
+		topo/ukwards.json \
+		--id-property WD11CD \
+		--properties WD11NM \
+		--simplify-proportion 0.5
+
