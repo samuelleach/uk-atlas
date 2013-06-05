@@ -5,11 +5,15 @@
 #              Statistics 2011 Ward boundaries. Thanks to John Nance
 #              for help with ogr2ogr.
 
+# 5 June 2013: Adding postal code boundaries from Geolytix.
+
 NATURALEARTH=http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural
 ONS=http://data.statistics.gov.uk/ONSGeography/CensusGeography/Boundaries/2011
+GEOLYTIX=http://geolytix.co.uk/images
 
 all: topo/uk.json \
-	topo/ukwards.topo.json
+	topo/ukwards.topo.json \
+	topo/geolytix/PostalArea.topo.json
 
 clean:
 	rm -rf gz shp topo ons
@@ -17,34 +21,37 @@ clean:
 tidy:
 	rm -rf *.README.html *.VERSION.txt *.prj
 
-gz/%.zip:
+
+# UK Boundary from Natural Earth data
+
+gz/ne/%.zip:
 	mkdir -p $(dir $@) && wget $(NATURALEARTH)/$(notdir $@) -O $@.download && mv $@.download $@
 
 #Note that ogr2ogr requires the .shp, .shx and .dbf files to work.
-shp/%.shp: gz/%.zip
-	mkdir -p $(dir $@) && unzip $< && mv *.shp $(dir $@) && mv *.shx $(dir $@) && mv *.dbf $(dir $@) && mv *.prj $(dir $@)
+shp/ne/%.shp: gz/ne/%.zip
+	mkdir -p $(dir $@) && unzip $< -d $(dir $@)
 	touch $@
 	make tidy
 
-topo/subunits.json: shp/ne_10m_admin_0_map_subunits.shp
+topo/subunits.json: shp/ne/ne_10m_admin_0_map_subunits.shp
 	mkdir -p $(dir $@)
-	cd shp; \
+	cd shp/ne; \
 	ogr2ogr \
 		-f GeoJSON \
 		-where "adm0_a3 IN ('GBR', 'IRL')" \
 		subunits.json \
 		ne_10m_admin_0_map_subunits.shp; \
-	mv $(notdir $@) ../$@
+	mv $(notdir $@) ../../$@
 	
-topo/places.json: shp/ne_10m_populated_places.shp
+topo/places.json: shp/ne/ne_10m_populated_places.shp
 	mkdir -p $(dir $@)
-	cd shp; \
+	cd shp/ne; \
 	ogr2ogr \
 		-f GeoJSON \
 		-where "iso_a2 = 'GB' AND SCALERANK < 8" \
 		places.json \
 		ne_10m_populated_places.shp; \
-	mv $(notdir $@) ../$@	
+	mv $(notdir $@) ../../$@	
 
 topo/uk.json: topo/subunits.json topo/places.json
 	mkdir -p $(dir $@)
@@ -55,6 +62,8 @@ topo/uk.json: topo/subunits.json topo/places.json
 		-o topo/uk.json \
 		topo/subunits.json \
 		topo/places.json
+
+# English Wards, from Office of National Statistics.
 
 ons/WD_DEC_2011_EW_BGC_shp.zip: 
 	mkdir -p $(dir $@) && wget $(ONS)/Wards/$(notdir $@) -O $@.download && mv $@.download $@
@@ -81,4 +90,56 @@ topo/ukwards.topo.json: topo/ukwards.json
 		--id-property WD11CD \
 		--properties WD11NM \
 		--simplify-proportion 0.5
+
+# English and Scottish postal boundaries from Geolytix.
+
+gz/geolytix/PostalBoundariesSHP.zip: 
+	mkdir -p $(dir $@) && wget $(GEOLYTIX)/$(notdir $@) -O $@.download && mv $@.download $@
+	touch $@
+
+shp/geolytix/PostalBoundariesSHP/%.shp: gz/geolytix/PostalBoundariesSHP.zip
+	rm -rf $(dir $@) && mkdir -p $(dir $@) && unzip $< -d $(dir $@)
+	touch $(dir $@)/*
+
+topo/geolytix/PostalArea.json: shp/geolytix/PostalBoundariesSHP/PostalArea.shp
+	mkdir -p $(dir $@)
+	cd shp/geolytix/PostalBoundariesSHP; \
+	ogr2ogr \
+		-t_srs "EPSG:4326" \
+		-f GEOJSON \
+		PostalArea.json \
+		PostalArea.shp; \
+	mv $(notdir $@) ../../../$@
+
+topo/geolytix/PostalArea.topo.json: topo/geolytix/PostalArea.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o topo/geolytix/PostalArea.topo.json \
+		topo/geolytix/PostalArea.json \
+		--id-property AreaID \
+		--properties \
+		--simplify-proportion 0.2
+
+topo/geolytix/PostalDistrict.json: shp/geolytix/PostalBoundariesSHP/PostalDistrict.shp
+	mkdir -p $(dir $@)
+	cd shp/geolytix/PostalBoundariesSHP; \
+	ogr2ogr \
+		-t_srs "EPSG:4326" \
+		-f GEOJSON \
+		PostalDistrict.json \
+		PostalDistrict.shp; \
+	mv $(notdir $@) ../../../$@
+
+topo/geolytix/PostalDistrict.topo.json: topo/geolytix/PostalDistrict.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o topo/geolytix/PostalDistrict.topo.json \
+		topo/geolytix/PostalDistrict.json \
+		--id-property DistID \
+		--properties \
+		--simplify-proportion 0.5
+
+
+
+
 
