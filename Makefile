@@ -116,7 +116,7 @@ topo/geolytix/PostalArea.topo.json: topo/geolytix/PostalArea.json
 	topojson \
 		-o topo/geolytix/PostalArea.topo.json \
 		topo/geolytix/PostalArea.json \
-		--id-property AreaID \
+		--id-property PostArea \
 		--properties \
 		--simplify-proportion 0.2
 
