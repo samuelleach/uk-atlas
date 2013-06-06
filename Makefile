@@ -135,9 +135,9 @@ topo/geolytix/PostalDistrict.topo.json: topo/geolytix/PostalDistrict.json
 	topojson \
 		-o topo/geolytix/PostalDistrict.topo.json \
 		topo/geolytix/PostalDistrict.json \
-		--id-property DistID \
+		--id-property PostDist \
 		--properties \
-		--simplify-proportion 0.5
+		--simplify-proportion 0.2
 
 
 
