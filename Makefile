@@ -139,7 +139,24 @@ topo/geolytix/PostalDistrict.topo.json: topo/geolytix/PostalDistrict.json
 		--properties \
 		--simplify-proportion 0.2
 
+topo/geolytix/PostalDistrict_v2.json: shp/geolytix/PostalBoundariesSHP/PostalDistrict_v2.shp
+	mkdir -p $(dir $@)
+	cd shp/geolytix/PostalBoundariesSHP; \
+	ogr2ogr \
+		-t_srs "EPSG:4326" \
+		-f GEOJSON \
+		PostalDistrict_v2.json \
+		PostalDistrict_v2.shp; \
+	mv $(notdir $@) ../../../$@
 
+topo/geolytix/PostalDistrict_v2.topo.json: topo/geolytix/PostalDistrict_v2.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o topo/geolytix/PostalDistrict_v2.topo.json \
+		topo/geolytix/PostalDistrict_v2.json \
+		--id-property PostDist \
+		--properties \
+		--simplify-proportion 0.2
 
 
 
