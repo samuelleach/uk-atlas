@@ -120,6 +120,34 @@ topo/england_wales_lsoa_2011.topo.json: topo/england_wales_lsoa_2011.json
 		--properties \
 		--simplify-proportion 0.2
 
+# England and Wales MSOAs from ONS
+ons/Middle_layer_super_output_areas_(E+W)_2011_Boundaries_(Generalised_Clipped).zip:
+	mkdir -p $(dir $@) && wget --no-check-certificate $(ONS2)/Middle_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip -O tmp.download && mv tmp.download $(dir $@)/Middle_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip
+	touch $(dir $@)/Middle_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip
+
+shp/ons/MSOA_2011_EW_BGC.shp: ons/Middle_layer_super_output_areas_(E+W)_2011_Boundaries_(Generalised_Clipped).zip
+	mkdir -p $(dir $@) && unzip ons/Middle_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip -d $(dir $@)
+	touch $@
+
+topo/england_wales_msoa_2011.json: shp/ons/MSOA_2011_EW_BGC.shp
+	mkdir -p $(dir $@)
+	cd shp/ons; \
+	ogr2ogr \
+		-t_srs "EPSG:4326" \
+		-f GEOJSON \
+		england_wales_msoa_2011.json \
+		MSOA_2011_EW_BGC.shp; \
+	mv $(notdir $@) ../../$@
+
+topo/england_wales_msoa_2011.topo.json: topo/england_wales_msoa_2011.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--id-property MSOA11CD \
+		--properties \
+		--simplify-proportion 0.2
+
 # English and Scottish postal boundaries from Geolytix.
 gz/geolytix/PostalBoundariesSHP.zip: 
 	mkdir -p $(dir $@) && wget $(GEOLYTIX)/$(notdir $@) -O $@.download && mv $@.download $@
