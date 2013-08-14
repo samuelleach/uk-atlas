@@ -11,7 +11,7 @@ NATURALEARTH=http://www.naturalearthdata.com/http//www.naturalearthdata.com/down
 ONS=http://data.statistics.gov.uk/ONSGeography/CensusGeography/Boundaries/2011
 GEOLYTIX=http://geolytix.co.uk/images
 ONS2=https://geoportal.statistics.gov.uk/Docs/Boundaries
-#wget --no-check-certificate https://geoportal.statistics.gov.uk/Docs/Boundaries/Lower_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip
+SNS=http://www.sns.gov.uk/BulkDownloads
 
 all: topo/uk.json \
 	topo/ukwards.topo.json \
@@ -25,7 +25,6 @@ tidy:
 
 
 # UK Boundary from Natural Earth data
-
 gz/ne/%.zip:
 	mkdir -p $(dir $@) && wget $(NATURALEARTH)/$(notdir $@) -O $@.download && mv $@.download $@
 
@@ -147,6 +146,33 @@ topo/england_wales_msoa_2011.topo.json: topo/england_wales_msoa_2011.json
 		--id-property MSOA11CD \
 		--properties \
 		--simplify-proportion 0.2
+
+# Scottish data zones from Scottish Neighbourhood Statistics
+sns/SNS_Geography_14_3_2013.zip: 
+	mkdir -p $(dir $@) && wget $(SNS)/$(notdir $@) -O $@.download && mv $@.download $@
+
+shp/sns/DataZone_2001_bdry.shp: sns/SNS_Geography_14_3_2013.zip
+	mkdir -p $(dir $@) && unzip $< -d $(dir $@)
+	touch $@
+
+topo/scotland_datazone_2001.json: shp/sns/DataZone_2001_bdry.shp
+	mkdir -p $(dir $@)
+	cd $(dir $<); \
+	ogr2ogr \
+		-t_srs "EPSG:4326" \
+		-f GEOJSON \
+		$(notdir $@) \
+		$(notdir $<); \
+	mv $(notdir $@) ../../$@
+
+topo/scotland_datazone_2001.topo.json: topo/scotland_datazone_2001.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--id-property DZ_CODE \
+		--properties \
+		--simplify-proportion 0.5
 
 # English and Scottish postal boundaries from Geolytix.
 gz/geolytix/PostalBoundariesSHP.zip: 
