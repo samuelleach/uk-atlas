@@ -66,7 +66,6 @@ topo/uk.json: topo/subunits.json topo/places.json
 		topo/places.json
 
 # English Wards, from Office of National Statistics.
-
 ons/WD_DEC_2011_EW_BGC_shp.zip: 
 	mkdir -p $(dir $@) && wget $(ONS)/Wards/$(notdir $@) -O $@.download && mv $@.download $@
 
@@ -102,8 +101,26 @@ shp/ons/LSOA_2011_EW_BGC.shp: ons/Lower_layer_super_output_areas_(E+W)_2011_Boun
 	mkdir -p $(dir $@) && unzip ons/Lower_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip -d $(dir $@)
 	touch $@
 
-# English and Scottish postal boundaries from Geolytix.
+topo/england_wales_lsoa_2011.json: shp/ons/LSOA_2011_EW_BGC.shp
+	mkdir -p $(dir $@)
+	cd shp/ons; \
+	ogr2ogr \
+		-t_srs "EPSG:4326" \
+		-f GEOJSON \
+		england_wales_lsoa_2011.json \
+		LSOA_2011_EW_BGC.shp; \
+	mv $(notdir $@) ../../$@
 
+topo/england_wales_lsoa_2011.topo.json: topo/england_wales_lsoa_2011.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--id-property LSOA11CD \
+		--properties \
+		--simplify-proportion 0.2
+
+# English and Scottish postal boundaries from Geolytix.
 gz/geolytix/PostalBoundariesSHP.zip: 
 	mkdir -p $(dir $@) && wget $(GEOLYTIX)/$(notdir $@) -O $@.download && mv $@.download $@
 	touch $@
