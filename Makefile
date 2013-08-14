@@ -174,6 +174,30 @@ topo/scotland_datazone_2001.topo.json: topo/scotland_datazone_2001.json
 		--properties \
 		--simplify-proportion 0.5
 
+# Scottish intermediate zones from Scottish Neighbourhood Statistics
+shp/sns/IntermediateZone_2001_bdry.shp: sns/SNS_Geography_14_3_2013.zip
+	mkdir -p $(dir $@) && unzip $< -d $(dir $@)
+	touch $@
+
+topo/scotland_intermediatezone_2001.json: shp/sns/IntermediateZone_2001_bdry.shp
+	mkdir -p $(dir $@)
+	cd $(dir $<); \
+	ogr2ogr \
+		-t_srs "EPSG:4326" \
+		-f GEOJSON \
+		$(notdir $@) \
+		$(notdir $<); \
+	mv $(notdir $@) ../../$@
+
+topo/scotland_intermediatezone_2001.topo.json: topo/scotland_intermediatezone_2001.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--id-property IZ_CODE \
+		--properties \
+		--simplify-proportion 0.5
+
 # English and Scottish postal boundaries from Geolytix.
 gz/geolytix/PostalBoundariesSHP.zip: 
 	mkdir -p $(dir $@) && wget $(GEOLYTIX)/$(notdir $@) -O $@.download && mv $@.download $@
