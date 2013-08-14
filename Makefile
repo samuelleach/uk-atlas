@@ -10,6 +10,8 @@
 NATURALEARTH=http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural
 ONS=http://data.statistics.gov.uk/ONSGeography/CensusGeography/Boundaries/2011
 GEOLYTIX=http://geolytix.co.uk/images
+ONS2=https://geoportal.statistics.gov.uk/Docs/Boundaries
+#wget --no-check-certificate https://geoportal.statistics.gov.uk/Docs/Boundaries/Lower_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip
 
 all: topo/uk.json \
 	topo/ukwards.topo.json \
@@ -90,6 +92,15 @@ topo/ukwards.topo.json: topo/ukwards.json
 		--id-property WD11CD \
 		--properties WD11NM \
 		--simplify-proportion 0.5
+
+# England and Wales LSOAs from ONS
+ons/Lower_layer_super_output_areas_(E+W)_2011_Boundaries_(Generalised_Clipped).zip:
+	mkdir -p $(dir $@) && wget --no-check-certificate $(ONS2)/Lower_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip -O tmp.download && mv tmp.download $(dir $@)/Lower_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip
+	touch $(dir $@)/Lower_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip
+
+shp/ons/LSOA_2011_EW_BGC.shp: ons/Lower_layer_super_output_areas_(E+W)_2011_Boundaries_(Generalised_Clipped).zip
+	mkdir -p $(dir $@) && unzip ons/Lower_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip -d $(dir $@)
+	touch $@
 
 # English and Scottish postal boundaries from Geolytix.
 
