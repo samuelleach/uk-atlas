@@ -89,6 +89,34 @@ topo/ukwards.topo.json: topo/ukwards.json
 		--properties WD11NM \
 		--simplify-proportion 0.5
 
+# England and Wales OAs from ONS
+ons/Output_areas_(E+W)_2011_Boundaries_(Generalised_Clipped).zip:
+	mkdir -p $(dir $@) && wget --no-check-certificate $(ONS2)/Output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip -O tmp.download && mv tmp.download $(dir $@)/Output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip
+	touch $(dir $@)/Output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip
+
+shp/ons/OA_2011_EW_BGC.shp: ons/Output_areas_(E+W)_2011_Boundaries_(Generalised_Clipped).zip
+	mkdir -p $(dir $@) && unzip -u ons/Output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip -d $(dir $@)
+	touch $@
+
+topo/england_wales_oa_2011.json: shp/ons/OA_2011_EW_BGC.shp
+	mkdir -p $(dir $@)
+	cd shp/ons; \
+	ogr2ogr \
+		-t_srs "EPSG:4326" \
+		-f GEOJSON \
+		$(notdir $@) \
+		$(notdir $<); \
+	mv $(notdir $@) ../../$@
+
+topo/england_wales_oa_2011.topo.json: topo/england_wales_oa_2011.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--id-property OA11CD \
+		--properties \
+		--simplify-proportion 0.2
+
 # England and Wales LSOAs from ONS
 ons/Lower_layer_super_output_areas_(E+W)_2011_Boundaries_(Generalised_Clipped).zip:
 	mkdir -p $(dir $@) && wget --no-check-certificate $(ONS2)/Lower_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip -O tmp.download && mv tmp.download $(dir $@)/Lower_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip
