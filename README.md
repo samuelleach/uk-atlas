@@ -8,4 +8,4 @@ This Makefile can be used to download various UK shapefiles and convert them to 
 - England, Wales and Scotland counties and bouroughs.
 - Ordnance Survey Boundary Line shapefiles.
 
-Run 'make all' to procuce them.
+Run 'make all' to produce them.
