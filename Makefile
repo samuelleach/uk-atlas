@@ -17,11 +17,10 @@ all: topo/uk.json \
 	topo/scotland_intermediatezone_2001.topo.json
 
 clean:
-	rm -rf gz shp topo ons sns
+	rm -rf gz shp topo ons sns os
 
 tidy:
 	rm -rf *.README.html *.VERSION.txt *.prj
-
 
 # UK Boundary from Natural Earth data
 gz/ne/%.zip:
@@ -291,6 +290,20 @@ topo/geolytix/PostalDistrict_v2.topo.json: topo/geolytix/PostalDistrict_v2.json
 		--id-property PostDist \
 		--properties \
 		--simplify-proportion 0.2
+
+# Boundary Line data from Ordnance survey
+os/bdline_gb.zip: 
+	mkdir -p $(dir $@); \
+	echo "What is the full path of the directory where the bdline_gp.zip file is found?"; \
+	read path; \
+	echo "Copying $(notdir $@) to $(dir $@)"; \
+	cp -pr $$path/$(notdir $@) $(dir $@)
+	touch $@
+
+shp/os/Data/%.shp: os/bdline_gb.zip
+	mkdir -p $(dir $@) && unzip -u $< -d $(dir $@)
+	touch $@
+
 
 
 
