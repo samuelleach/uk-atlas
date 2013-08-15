@@ -9,7 +9,12 @@ SNS=http://www.sns.gov.uk/BulkDownloads
 all: topo/uk.json \
 	topo/ukwards.topo.json \
 	topo/geolytix/PostalArea.topo.json \
-	topo/geolytix/PostalDistrict.topo.json
+	topo/geolytix/PostalDistrict.topo.json \
+	topo/england_wales_lsoa_2011.topo.json \
+	topo/england_wales_msoa_2011.topo.json \
+	topo/scotland_datazone_2001.topo.json \
+	topo/scotland_intermediatezone_2001.topo.json
+
 
 clean:
 	rm -rf gz shp topo ons sns

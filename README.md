@@ -1,5 +1,9 @@
-This Makefile currently produces the uk.json topojson file demonstrated in Mike Bostock's d3
-tutorial http://bost.ocks.org/mike/map/
+This Makefile can be used to download various UK shapefiles and convert them to geojson and topojson formats. Currently we have:
 
-I'm interested to include data with other UK boundaries such as
-counties and electoral constituencies.
+- UK boundary.
+- UK wards.
+- England and Wales LSOAs and MSOAs.
+- Scottish Datazones and Intermediate zones.
+- England, Wales and Scotland postal areas and postal districts.
+
+Run 'make all' to procuce them.
