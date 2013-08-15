@@ -14,7 +14,18 @@ all: topo/uk.json \
 	topo/england_wales_lsoa_2011.topo.json \
 	topo/england_wales_msoa_2011.topo.json \
 	topo/scotland_datazone_2001.topo.json \
-	topo/scotland_intermediatezone_2001.topo.json
+	topo/scotland_intermediatezone_2001.topo.json \
+	topo/os/bdline_gb/Data/county_region.topo.json \
+	topo/os/bdline_gb/Data/district_borough_unitary_region.topo.json \
+	topo/os/bdline_gb/Data/european_region_region.topo.json \
+	topo/os/bdline_gb/Data/county_electoral_division_region.topo.json \
+	topo/os/bdline_gb/Data/unitary_electoral_division_region.topo.json \
+	topo/os/bdline_gb/Data/district_borough_unitary_ward_region.topo.json \
+	topo/os/bdline_gb/Data/parish_region.topo.json \
+	topo/os/bdline_gb/Data/scotland_and_wales_region_region.topo.json \
+	topo/os/bdline_gb/Data/westminster_const_region.topo.json \
+	topo/os/bdline_gb/Data/greater_london_const_region.topo.json \
+	topo/os/bdline_gb/Data/high_water_polyline.topo.json
 
 clean:
 	rm -rf gz shp topo ons sns os
@@ -300,11 +311,11 @@ os/bdline_gb.zip:
 	cp -pr $$path/$(notdir $@) $(dir $@)
 	touch $@
 
-shp/os/bd_line/Data/bdline_gb/Data/%.shp: os/bdline_gb.zip
-	mkdir -p $(dir $@) && unzip -u $< -d $(dir $@)
+shp/os/%.shp: os/bdline_gb.zip
+	mkdir -p $(dir $@) && unzip -u $< -d shp/$(dir @<)
 	touch $@
 
-topo/os/%.json: shp/os/bd_line/Data/bdline_gb/Data/%.shp
+topo/os/%.json: shp/os/%.shp
 	mkdir -p $(dir $@)
 	cd $(dir $<); \
 	ogr2ogr \
@@ -314,7 +325,7 @@ topo/os/%.json: shp/os/bd_line/Data/bdline_gb/Data/%.shp
 		$(notdir $<)
 	mv $(dir $<)/$(notdir $@) $@
 
-topo/os/county_region.topo.json: topo/os/county_region.json
+topo/os/bdline_gb/Data/county_region.topo.json: topo/os/bdline_gb/Data/county_region.json
 	mkdir -p $(dir $@)
 	topojson \
 		-o $@ \
@@ -322,7 +333,7 @@ topo/os/county_region.topo.json: topo/os/county_region.json
 		--properties \
 		--simplify-proportion 0.2
 
-topo/os/district_borough_unitary_region.topo.json: topo/os/district_borough_unitary_region.json
+topo/os/bdline_gb/Data/district_borough_unitary_region.topo.json: topo/os/bdline_gb/Data/district_borough_unitary_region.json
 	mkdir -p $(dir $@)
 	topojson \
 		-o $@ \
@@ -330,4 +341,74 @@ topo/os/district_borough_unitary_region.topo.json: topo/os/district_borough_unit
 		--properties \
 		--simplify-proportion 0.2
 
+topo/os/bdline_gb/Data/european_region_region.topo.json: topo/os/bdline_gb/Data/european_region_region.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
 
+topo/os/bdline_gb/Data/county_electoral_division_region.topo.json: topo/os/bdline_gb/Data/county_electoral_division_region.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
+
+topo/os/bdline_gb/Data/unitary_electoral_division_region.topo.json: topo/os/bdline_gb/Data/unitary_electoral_division_region.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
+
+topo/os/bdline_gb/Data/district_borough_unitary_ward_region.topo.json: topo/os/bdline_gb/Data/district_borough_unitary_ward_region.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
+
+topo/os/bdline_gb/Data/parish_region.topo.json: topo/os/bdline_gb/Data/parish_region.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
+
+topo/os/bdline_gb/Data/scotland_and_wales_region_region.topo.json: topo/os/bdline_gb/Data/scotland_and_wales_region_region.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
+
+topo/os/bdline_gb/Data/westminster_const_region.topo.json: topo/os/bdline_gb/Data/westminster_const_region.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
+
+topo/os/bdline_gb/Data/greater_london_const_region.topo.json: topo/os/bdline_gb/Data/greater_london_const_region.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
+
+topo/os/bdline_gb/Data/high_water_polyline.topo.json: topo/os/bdline_gb/Data/high_water_polyline.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
