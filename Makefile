@@ -15,10 +15,11 @@ SNS=http://www.sns.gov.uk/BulkDownloads
 
 all: topo/uk.json \
 	topo/ukwards.topo.json \
-	topo/geolytix/PostalArea.topo.json
+	topo/geolytix/PostalArea.topo.json \
+	topo/geolytix/PostalDistrict.topo.json
 
 clean:
-	rm -rf gz shp topo ons
+	rm -rf gz shp topo ons sns
 
 tidy:
 	rm -rf *.README.html *.VERSION.txt *.prj
@@ -85,8 +86,8 @@ topo/ukwards.json: shp/ons/WD_DEC_2011_EW_BGC.shp
 topo/ukwards.topo.json: topo/ukwards.json
 	mkdir -p $(dir $@)
 	topojson \
-		-o topo/ukwards.topo.json \
-		topo/ukwards.json \
+		-o $@ \
+		$< \
 		--id-property WD11CD \
 		--properties WD11NM \
 		--simplify-proportion 0.5
@@ -213,15 +214,15 @@ topo/geolytix/PostalArea.json: shp/geolytix/PostalBoundariesSHP/PostalArea.shp
 	ogr2ogr \
 		-t_srs "EPSG:4326" \
 		-f GEOJSON \
-		PostalArea.json \
-		PostalArea.shp; \
+		$(notdir $@) \
+		$(notdir $<); \
 	mv $(notdir $@) ../../../$@
 
 topo/geolytix/PostalArea.topo.json: topo/geolytix/PostalArea.json
 	mkdir -p $(dir $@)
 	topojson \
-		-o topo/geolytix/PostalArea.topo.json \
-		topo/geolytix/PostalArea.json \
+		-o $@ \
+		$< \
 		--id-property PostArea \
 		--properties \
 		--simplify-proportion 0.2
@@ -232,15 +233,15 @@ topo/geolytix/PostalDistrict.json: shp/geolytix/PostalBoundariesSHP/PostalDistri
 	ogr2ogr \
 		-t_srs "EPSG:4326" \
 		-f GEOJSON \
-		PostalDistrict.json \
-		PostalDistrict.shp; \
+		$(notdir $@) \
+		$(notdir $<); \
 	mv $(notdir $@) ../../../$@
 
 topo/geolytix/PostalDistrict.topo.json: topo/geolytix/PostalDistrict.json
 	mkdir -p $(dir $@)
 	topojson \
-		-o topo/geolytix/PostalDistrict.topo.json \
-		topo/geolytix/PostalDistrict.json \
+		-o $@ \
+		$< \
 		--id-property PostDist \
 		--properties \
 		--simplify-proportion 0.2
@@ -251,15 +252,15 @@ topo/geolytix/PostalDistrict_v2.json: shp/geolytix/PostalBoundariesSHP/PostalDis
 	ogr2ogr \
 		-t_srs "EPSG:4326" \
 		-f GEOJSON \
-		PostalDistrict_v2.json \
-		PostalDistrict_v2.shp; \
+		$(notdir $@) \
+		$(notdir $<); \
 	mv $(notdir $@) ../../../$@
 
 topo/geolytix/PostalDistrict_v2.topo.json: topo/geolytix/PostalDistrict_v2.json
 	mkdir -p $(dir $@)
 	topojson \
-		-o topo/geolytix/PostalDistrict_v2.topo.json \
-		topo/geolytix/PostalDistrict_v2.json \
+		-o $@ \
+		$< \
 		--id-property PostDist \
 		--properties \
 		--simplify-proportion 0.2
