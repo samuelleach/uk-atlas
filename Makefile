@@ -34,7 +34,7 @@ shp/ne/%.shp: gz/ne/%.zip
 
 topo/subunits.json: shp/ne/ne_10m_admin_0_map_subunits.shp
 	mkdir -p $(dir $@)
-	cd shp/ne; \
+	cd $(dir $<); \
 	ogr2ogr \
 		-f GeoJSON \
 		-where "adm0_a3 IN ('GBR', 'IRL')" \
@@ -44,7 +44,7 @@ topo/subunits.json: shp/ne/ne_10m_admin_0_map_subunits.shp
 	
 topo/places.json: shp/ne/ne_10m_populated_places.shp
 	mkdir -p $(dir $@)
-	cd shp/ne; \
+	cd $(dir $<); \
 	ogr2ogr \
 		-f GeoJSON \
 		-where "iso_a2 = 'GB' AND SCALERANK < 8" \
@@ -72,7 +72,7 @@ shp/ons/WD_DEC_2011_EW_BGC.shp: ons/WD_DEC_2011_EW_BGC_shp.zip
 
 topo/ukwards.json: shp/ons/WD_DEC_2011_EW_BGC.shp
 	mkdir -p $(dir $@)
-	cd shp/ons; \
+	cd $(dir $<); \
 	ogr2ogr \
 		-t_srs "EPSG:4326" \
 		-f GEOJSON \
@@ -100,7 +100,7 @@ shp/ons/OA_2011_EW_BGC.shp: ons/Output_areas_(E+W)_2011_Boundaries_(Generalised_
 
 topo/england_wales_oa_2011.json: shp/ons/OA_2011_EW_BGC.shp
 	mkdir -p $(dir $@)
-	cd shp/ons; \
+	cd $(dir $<); \
 	ogr2ogr \
 		-t_srs "EPSG:4326" \
 		-f GEOJSON \
@@ -128,7 +128,7 @@ shp/ons/LSOA_2011_EW_BGC.shp: ons/Lower_layer_super_output_areas_(E+W)_2011_Boun
 
 topo/england_wales_lsoa_2011.json: shp/ons/LSOA_2011_EW_BGC.shp
 	mkdir -p $(dir $@)
-	cd shp/ons; \
+	cd $(dir $<); \
 	ogr2ogr \
 		-t_srs "EPSG:4326" \
 		-f GEOJSON \
@@ -156,7 +156,7 @@ shp/ons/MSOA_2011_EW_BGC.shp: ons/Middle_layer_super_output_areas_(E+W)_2011_Bou
 
 topo/england_wales_msoa_2011.json: shp/ons/MSOA_2011_EW_BGC.shp
 	mkdir -p $(dir $@)
-	cd shp/ons; \
+	cd $(dir $<); \
 	ogr2ogr \
 		-t_srs "EPSG:4326" \
 		-f GEOJSON \
@@ -236,7 +236,7 @@ shp/geolytix/PostalBoundariesSHP/%.shp: gz/geolytix/PostalBoundariesSHP.zip
 
 topo/geolytix/PostalArea.json: shp/geolytix/PostalBoundariesSHP/PostalArea.shp
 	mkdir -p $(dir $@)
-	cd shp/geolytix/PostalBoundariesSHP; \
+	cd $(dir $<); \
 	ogr2ogr \
 		-t_srs "EPSG:4326" \
 		-f GEOJSON \
@@ -255,7 +255,7 @@ topo/geolytix/PostalArea.topo.json: topo/geolytix/PostalArea.json
 
 topo/geolytix/PostalDistrict.json: shp/geolytix/PostalBoundariesSHP/PostalDistrict.shp
 	mkdir -p $(dir $@)
-	cd shp/geolytix/PostalBoundariesSHP; \
+	cd $(dir $<); \
 	ogr2ogr \
 		-t_srs "EPSG:4326" \
 		-f GEOJSON \
@@ -274,7 +274,7 @@ topo/geolytix/PostalDistrict.topo.json: topo/geolytix/PostalDistrict.json
 
 topo/geolytix/PostalDistrict_v2.json: shp/geolytix/PostalBoundariesSHP/PostalDistrict_v2.shp
 	mkdir -p $(dir $@)
-	cd shp/geolytix/PostalBoundariesSHP; \
+	cd $(dir $<); \
 	ogr2ogr \
 		-t_srs "EPSG:4326" \
 		-f GEOJSON \
@@ -300,10 +300,34 @@ os/bdline_gb.zip:
 	cp -pr $$path/$(notdir $@) $(dir $@)
 	touch $@
 
-shp/os/Data/%.shp: os/bdline_gb.zip
+shp/os/bd_line/Data/bdline_gb/Data/%.shp: os/bdline_gb.zip
 	mkdir -p $(dir $@) && unzip -u $< -d $(dir $@)
 	touch $@
 
+topo/os/%.json: shp/os/bd_line/Data/bdline_gb/Data/%.shp
+	mkdir -p $(dir $@)
+	cd $(dir $<); \
+	ogr2ogr \
+		-t_srs "EPSG:4326" \
+		-f GEOJSON \
+		$(notdir $@) \
+		$(notdir $<)
+	mv $(dir $<)/$(notdir $@) $@
 
+topo/os/county_region.topo.json: topo/os/county_region.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
+
+topo/os/district_borough_unitary_region.topo.json: topo/os/district_borough_unitary_region.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
 
 
