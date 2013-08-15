@@ -61,7 +61,7 @@ topo/uk.json: topo/subunits.json topo/places.json
 		--id-property su_a3 \
 		-p name=NAME \
 		-p name \
-		-o topo/uk.json \
+		-o $@ \
 		topo/subunits.json \
 		topo/places.json
 
@@ -79,8 +79,8 @@ topo/ukwards.json: shp/ons/WD_DEC_2011_EW_BGC.shp
 	ogr2ogr \
 		-t_srs "EPSG:4326" \
 		-f GEOJSON \
-		ukwards.json \
-		WD_DEC_2011_EW_BGC.shp; \
+		$(notdir $@) \
+		$(notdir $<); \
 	mv $(notdir $@) ../../$@
 
 topo/ukwards.topo.json: topo/ukwards.json
@@ -107,8 +107,8 @@ topo/england_wales_lsoa_2011.json: shp/ons/LSOA_2011_EW_BGC.shp
 	ogr2ogr \
 		-t_srs "EPSG:4326" \
 		-f GEOJSON \
-		england_wales_lsoa_2011.json \
-		LSOA_2011_EW_BGC.shp; \
+		$(notdir $@) \
+		$(notdir $<); \
 	mv $(notdir $@) ../../$@
 
 topo/england_wales_lsoa_2011.topo.json: topo/england_wales_lsoa_2011.json
@@ -135,8 +135,8 @@ topo/england_wales_msoa_2011.json: shp/ons/MSOA_2011_EW_BGC.shp
 	ogr2ogr \
 		-t_srs "EPSG:4326" \
 		-f GEOJSON \
-		england_wales_msoa_2011.json \
-		MSOA_2011_EW_BGC.shp; \
+		$(notdir $@) \
+		$(notdir $<); \
 	mv $(notdir $@) ../../$@
 
 topo/england_wales_msoa_2011.topo.json: topo/england_wales_msoa_2011.json
