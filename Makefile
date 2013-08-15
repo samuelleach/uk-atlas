@@ -5,6 +5,7 @@ ONS=http://data.statistics.gov.uk/ONSGeography/CensusGeography/Boundaries/2011
 GEOLYTIX=http://geolytix.co.uk/images
 ONS2=https://geoportal.statistics.gov.uk/Docs/Boundaries
 SNS=http://www.sns.gov.uk/BulkDownloads
+SHAREGEO=http://www.sharegeo.ac.uk/download
 
 all: topo/uk.json \
 	topo/ukwards.topo.json \
@@ -412,3 +413,33 @@ topo/os/bdline_gb/Data/high_water_polyline.topo.json: topo/os/bdline_gb/Data/hig
 		$< \
 		--properties \
 		--simplify-proportion 0.2
+
+# Sharegeo Green Belt.
+# 10672/325/Green%20Belt%20England%202011.zip
+gz/sharegeo/Green%20Belt%20England%202011.zip: 
+	mkdir -p $(dir $@) && wget $(SHAREGEO)/10672/325/$(notdir $@) -O $@.download && mv $@.download $@
+	touch $@
+
+shp/sharegeo/%.shp: gz/sharegeo/Green%20Belt%20England%202011.zip
+	rm -rf $(dir $@) && mkdir -p $(dir $@) && unzip $< -d $(dir $@)
+	touch $(dir $@)/*
+
+topo/sharegeo/GreenBelt2011.json: shp/sharegeo/GreenBelt2011.shp
+	mkdir -p $(dir $@)
+	cd $(dir $<); \
+	ogr2ogr \
+		-t_srs "EPSG:4326" \
+		-f GEOJSON \
+		$(notdir $@) \
+		$(notdir $<)
+	mv $(dir $<)/$(notdir $@) $@
+
+topo/sharegeo/GreenBelt2011.topo.json: topo/sharegeo/GreenBelt2011.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
+
+
