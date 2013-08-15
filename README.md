@@ -1,3 +1,7 @@
+<p align="center" >
+  <img src="https://raw.github.com/samuelleach/uk-atlas/master/img/logo.png" alt="uk-atlas" title="uk-atlas">
+</p>
+
 This Makefile can be used to download various UK shapefiles and convert them to geojson and topojson formats. Currently we have:
 
 - UK boundary.
