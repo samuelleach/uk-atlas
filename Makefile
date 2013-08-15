@@ -15,7 +15,6 @@ all: topo/uk.json \
 	topo/scotland_datazone_2001.topo.json \
 	topo/scotland_intermediatezone_2001.topo.json
 
-
 clean:
 	rm -rf gz shp topo ons sns
 
@@ -149,9 +148,10 @@ topo/england_wales_msoa_2011.topo.json: topo/england_wales_msoa_2011.json
 # Scottish data zones from Scottish Neighbourhood Statistics
 sns/SNS_Geography_14_3_2013.zip: 
 	mkdir -p $(dir $@) && wget $(SNS)/$(notdir $@) -O $@.download && mv $@.download $@
+	touch $@
 
 shp/sns/DataZone_2001_bdry.shp: sns/SNS_Geography_14_3_2013.zip
-	mkdir -p $(dir $@) && unzip $< -d $(dir $@)
+	mkdir -p $(dir $@) && unzip -u $< -d $(dir $@)
 	touch $@
 
 topo/scotland_datazone_2001.json: shp/sns/DataZone_2001_bdry.shp
