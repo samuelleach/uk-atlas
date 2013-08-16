@@ -522,3 +522,11 @@ topo/sharegeo/uk_police_force_areas.topo.json: topo/sharegeo/uk_police_force_are
 		$< \
 		--properties \
 		--simplify-proportion 0.2
+
+# Share geo (ONS) Strategic Health Authorities (England), Primary Care Organisations (England), Local Health Boards (Wales)
+gz/sharegeo/Health%20Authority%20Boundaries%20for%20England%20and%20Wales.zip: 
+	mkdir -p $(dir $@) && wget $(SHAREGEO)/10672/333/$(notdir $@) -O $@.download && mv $@.download $@
+	touch $@
+
+
+
