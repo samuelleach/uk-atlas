@@ -14,7 +14,15 @@ OS_STRTGI_SHP = \
 		railway_line antiquity_line ferry_line lakes_region \
 		motorway urban_region
 		# land_use_seed tourist_symbol general_text land_use_symbol road_point \
-		# transport_symbol admin_seed settlement_seed transport_text railway_point spot_height 
+		# transport_symbol admin_seed settlement_seed transport_text railway_point spot_height
+
+OS_MERIDIAN2_SHP = \
+		a_road_polyline coast_ln_polyline dlua_region \
+		river_polyline woodland_region admin_ln_polyline \
+		county_region motorway_polyline \
+		b_road_polyline district_region lake_region rail_ln_polyline
+		# minor_rd_polyline roadnode_point #out of memory on these one
+		# settlemt_point junction_font_point rndabout_point station_point text
 
 all: topo/ne/uk.json \
 	topo/ons/ukwards.topo.json \
@@ -37,7 +45,8 @@ all: topo/ne/uk.json \
 	topo/os/bdline_gb/Data/westminster_const_region.topo.json \
 	topo/os/bdline_gb/Data/greater_london_const_region.topo.json \
 	topo/os/bdline_gb/Data/high_water_polyline.topo.json \
-	$(addprefix topo/os/strtgi_essh_gb/data/, $(addsuffix .topo.json, $(OS_STRTGI_SHP)))
+	$(addprefix topo/os/strtgi_essh_gb/data/, $(addsuffix .topo.json, $(OS_STRTGI_SHP))) \
+	$(addprefix topo/os/merid2_essh_gb/data/, $(addsuffix .topo.json, $(OS_MERIDIAN2_SHP)))
 
 clean:
 	rm -rf gz shp topo ons sns os
@@ -407,7 +416,7 @@ topo/os/bdline_gb/Data/high_water_polyline.topo.json: topo/os/bdline_gb/Data/hig
 		--properties \
 		--simplify-proportion 0.2
 
-# strtgi_essh_gb data from Ordnance survey
+# Strategi data from Ordnance survey
 shp/os/strtgi_essh_gb/%.shp: os/strtgi_essh_gb.zip
 	mkdir -p shp/$(basename $<) && unzip -u $< -d shp/$(basename $<)
 	touch $@
@@ -425,7 +434,15 @@ shp/os/merid2_essh_gb/%.shp: os/merid2_essh_gb.zip
 	mkdir -p shp/$(basename $<) && unzip -u $< -d shp/$(basename $<)
 	touch $@
 
-# Terrain 50 data from Ordnance survey
+topo/os/merid2_essh_gb/data/%.topo.json: topo/os/merid2_essh_gb/data/%.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
+
+# Terrain 50 (height) data from Ordnance survey
 shp/os/terr50_cesh_gb/%.shp: os/terr50_cesh_gb.zip
 	mkdir -p shp/$(basename $<) && unzip -u $< -d shp/$(basename $<)
 	touch $@
