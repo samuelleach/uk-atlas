@@ -7,6 +7,15 @@ ONS2=https://geoportal.statistics.gov.uk/Docs/Boundaries
 SNS=http://www.sns.gov.uk/BulkDownloads
 SHAREGEO=http://www.sharegeo.ac.uk/download
 
+OS_STRTGI_SHP = \
+		a_road b_road foreshor_region national_park rivers_line \
+		woodland_region admin_line coastline \
+		primary_road ferry_box gridlines minor_road \
+		railway_line antiquity_line ferry_line lakes_region \
+		motorway urban_region
+		# land_use_seed tourist_symbol general_text land_use_symbol road_point \
+		# transport_symbol admin_seed settlement_seed transport_text railway_point spot_height 
+
 all: topo/ne/uk.json \
 	topo/ons/ukwards.topo.json \
 	topo/geolytix/PostalArea.topo.json \
@@ -27,7 +36,8 @@ all: topo/ne/uk.json \
 	topo/os/bdline_gb/Data/scotland_and_wales_region_region.topo.json \
 	topo/os/bdline_gb/Data/westminster_const_region.topo.json \
 	topo/os/bdline_gb/Data/greater_london_const_region.topo.json \
-	topo/os/bdline_gb/Data/high_water_polyline.topo.json
+	topo/os/bdline_gb/Data/high_water_polyline.topo.json \
+	$(addprefix topo/os/strtgi_essh_gb/data/, $(addsuffix .topo.json, $(OS_STRTGI_SHP)))
 
 clean:
 	rm -rf gz shp topo ons sns os
@@ -304,25 +314,6 @@ topo/geolytix/PostalDistrict_v2.topo.json: topo/geolytix/PostalDistrict_v2.json
 		--properties \
 		--simplify-proportion 0.2
 
-# Ordnance survey data manager and shapefile -> geojson converter.
-os/%.zip: 
-	mkdir -p $(dir $@); \
-	echo "What is the full path of the directory where the $(notdir $@) file is found?"; \
-	read path; \
-	echo "Copying $(notdir $@) to $(dir $@)"; \
-	cp -pr $$path/$(notdir $@) $(dir $@)
-	touch $@
-
-topo/os/%.json: shp/os/%.shp
-	mkdir -p $(dir $@)
-	cd $(dir $<); \
-	ogr2ogr \
-		-t_srs "EPSG:4326" \
-		-f GEOJSON \
-		$(notdir $@) \
-		$(notdir $<)
-	mv $(dir $<)/$(notdir $@) $@
-
 # Boundary Line data from Ordnance survey
 shp/os/bdline_gb/%.shp: os/bdline_gb.zip
 	mkdir -p shp/$(basename $<) && unzip -u $< -d shp/$(dir $<)
@@ -421,7 +412,7 @@ shp/os/strtgi_essh_gb/%.shp: os/strtgi_essh_gb.zip
 	mkdir -p shp/$(basename $<) && unzip -u $< -d shp/$(basename $<)
 	touch $@
 
-topo/os/strtgi_essh_gb/data/motorway.topo.json: topo/os/strtgi_essh_gb/data/motorway.json
+topo/os/strtgi_essh_gb/data/%.topo.json: topo/os/strtgi_essh_gb/data/%.json
 	mkdir -p $(dir $@)
 	topojson \
 		-o $@ \
@@ -438,6 +429,25 @@ shp/os/merid2_essh_gb/%.shp: os/merid2_essh_gb.zip
 shp/os/terr50_cesh_gb/%.shp: os/terr50_cesh_gb.zip
 	mkdir -p shp/$(basename $<) && unzip -u $< -d shp/$(basename $<)
 	touch $@
+
+# Ordnance survey data manager and shapefile -> geojson converter.
+os/%.zip: 
+	mkdir -p $(dir $@); \
+	echo "What is the full path of the directory where the $(notdir $@) file is found?"; \
+	read path; \
+	echo "Copying $(notdir $@) to $(dir $@)"; \
+	cp -pr $$path/$(notdir $@) $(dir $@)
+	touch $@
+
+topo/os/%.json: shp/os/%.shp
+	mkdir -p $(dir $@)
+	cd $(dir $<); \
+	ogr2ogr \
+		-t_srs "EPSG:4326" \
+		-f GEOJSON \
+		$(notdir $@) \
+		$(notdir $<)
+	mv $(dir $<)/$(notdir $@) $@
 
 # Sharegeo Green Belt.
 gz/sharegeo/Green%20Belt%20England%202011.zip: 
