@@ -14,5 +14,6 @@ This Makefile can be used to download various UK shapefiles and convert them to 
 - OS Strategi ("a regional overview of road networks, railway lines, cities and rural wooded areas").
 - OS Meridian 2 ("customisable for communication and topographical themes and route planning").
 - English Green Belt 2011 regions.
+- UK Police force areas.
 
 Run 'make all' to produce them.

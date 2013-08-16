@@ -24,6 +24,9 @@ OS_MERIDIAN2_SHP = \
 		# minor_rd_polyline roadnode_point #out of memory on these one
 		# settlemt_point junction_font_point rndabout_point station_point text
 
+SHAREGEO_SHP = \
+		GreenBelt2011 uk_police_force_areas
+
 all: topo/ne/uk.json \
 	topo/ons/ukwards.topo.json \
 	topo/geolytix/PostalArea.topo.json \
@@ -46,7 +49,8 @@ all: topo/ne/uk.json \
 	topo/os/bdline_gb/Data/greater_london_const_region.topo.json \
 	topo/os/bdline_gb/Data/high_water_polyline.topo.json \
 	$(addprefix topo/os/strtgi_essh_gb/data/, $(addsuffix .topo.json, $(OS_STRTGI_SHP))) \
-	$(addprefix topo/os/merid2_essh_gb/data/, $(addsuffix .topo.json, $(OS_MERIDIAN2_SHP)))
+	$(addprefix topo/os/merid2_essh_gb/data/, $(addsuffix .topo.json, $(OS_MERIDIAN2_SHP))) \
+	$(addprefix topo/sharegeo/, $(addsuffix .topo.json, $(SHAREGEO_SHP)))
 
 clean:
 	rm -rf gz shp topo ons sns os
@@ -471,11 +475,11 @@ gz/sharegeo/Green%20Belt%20England%202011.zip:
 	mkdir -p $(dir $@) && wget $(SHAREGEO)/10672/325/$(notdir $@) -O $@.download && mv $@.download $@
 	touch $@
 
-shp/sharegeo/%.shp: gz/sharegeo/Green%20Belt%20England%202011.zip
+shp/sharegeo/GreenBelt2011.shp: gz/sharegeo/Green%20Belt%20England%202011.zip
 	rm -rf $(dir $@) && mkdir -p $(dir $@) && unzip $< -d $(dir $@)
 	touch $(dir $@)/*
 
-topo/sharegeo/GreenBelt2011.json: shp/sharegeo/GreenBelt2011.shp
+topo/sharegeo/%.json: shp/sharegeo/%.shp
 	mkdir -p $(dir $@)
 	cd $(dir $<); \
 	ogr2ogr \
@@ -493,4 +497,28 @@ topo/sharegeo/GreenBelt2011.topo.json: topo/sharegeo/GreenBelt2011.json
 		--properties \
 		--simplify-proportion 0.2
 
+# Sharegeo Police areas (Geocommons)
+gz/sharegeo/UK%20Police%20Force%20areas.zip: 
+	mkdir -p $(dir $@) && wget $(SHAREGEO)/10672/328/$(notdir $@) -O $@.download && mv $@.download $@
+	touch $@
 
+shp/sharegeo/uk_police_force_areas.shp: gz/sharegeo/UK%20Police%20Force%20areas.zip
+	rm -rf $(dir $@) && mkdir -p $(dir $@) && unzip $< -d $(dir $@)
+	touch $(dir $@)/*
+
+topo/sharegeo/uk_police_force_areas.json: shp/sharegeo/uk_police_force_areas.shp
+	mkdir -p $(dir $@)
+	cd $(dir $<); \
+	ogr2ogr \
+		-f GEOJSON \
+		$(notdir $@) \
+		$(notdir $<)
+	mv $(dir $<)/$(notdir $@) $@
+
+topo/sharegeo/uk_police_force_areas.topo.json: topo/sharegeo/uk_police_force_areas.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
