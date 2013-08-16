@@ -425,7 +425,7 @@ shp/os/merid2_essh_gb/%.shp: os/merid2_essh_gb.zip
 	mkdir -p shp/$(basename $<) && unzip -u $< -d shp/$(basename $<)
 	touch $@
 
-# # Terrain 50 data from Ordnance survey
+# Terrain 50 data from Ordnance survey
 shp/os/terr50_cesh_gb/%.shp: os/terr50_cesh_gb.zip
 	mkdir -p shp/$(basename $<) && unzip -u $< -d shp/$(basename $<)
 	touch $@
