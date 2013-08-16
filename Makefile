@@ -7,21 +7,22 @@ ONS2=https://geoportal.statistics.gov.uk/Docs/Boundaries
 SNS=http://www.sns.gov.uk/BulkDownloads
 SHAREGEO=http://www.sharegeo.ac.uk/download
 
-all: topo/uk.json \
-	topo/ukwards.topo.json \
+all: topo/ne/uk.json \
+	topo/ons/ukwards.topo.json \
 	topo/geolytix/PostalArea.topo.json \
 	topo/geolytix/PostalDistrict.topo.json \
-	topo/england_wales_oa_2011.topo.json \
-	topo/england_wales_lsoa_2011.topo.json \
-	topo/england_wales_msoa_2011.topo.json \
-	topo/scotland_datazone_2001.topo.json \
-	topo/scotland_intermediatezone_2001.topo.json \
+	topo/ons/england_wales_oa_2011.topo.json \
+	topo/ons/england_wales_lsoa_2011.topo.json \
+	topo/ons/england_wales_msoa_2011.topo.json \
+	topo/sns/scotland_datazone_2001.topo.json \
+	topo/sns/scotland_intermediatezone_2001.topo.json \
 	topo/os/bdline_gb/Data/county_region.topo.json \
 	topo/os/bdline_gb/Data/district_borough_unitary_region.topo.json \
 	topo/os/bdline_gb/Data/european_region_region.topo.json \
 	topo/os/bdline_gb/Data/county_electoral_division_region.topo.json \
 	topo/os/bdline_gb/Data/unitary_electoral_division_region.topo.json \
 	topo/os/bdline_gb/Data/district_borough_unitary_ward_region.topo.json \
+	topo/os/bdline_gb/Data/district_borough_unitary_region.topo.json \
 	topo/os/bdline_gb/Data/parish_region.topo.json \
 	topo/os/bdline_gb/Data/scotland_and_wales_region_region.topo.json \
 	topo/os/bdline_gb/Data/westminster_const_region.topo.json \
@@ -44,7 +45,7 @@ shp/ne/%.shp: gz/ne/%.zip
 	touch $@
 	make tidy
 
-topo/subunits.json: shp/ne/ne_10m_admin_0_map_subunits.shp
+topo/ne/subunits.json: shp/ne/ne_10m_admin_0_map_subunits.shp
 	mkdir -p $(dir $@)
 	cd $(dir $<); \
 	ogr2ogr \
@@ -54,7 +55,7 @@ topo/subunits.json: shp/ne/ne_10m_admin_0_map_subunits.shp
 		$(notdir $<); \
 	mv $(notdir $@) ../../$@
 	
-topo/places.json: shp/ne/ne_10m_populated_places.shp
+topo/ne/places.json: shp/ne/ne_10m_populated_places.shp
 	mkdir -p $(dir $@)
 	cd $(dir $<); \
 	ogr2ogr \
@@ -64,15 +65,15 @@ topo/places.json: shp/ne/ne_10m_populated_places.shp
 		$(notdir $<); \
 	mv $(notdir $@) ../../$@	
 
-topo/uk.json: topo/subunits.json topo/places.json
+topo/ne/uk.json: topo/ne/subunits.json topo/ne/places.json
 	mkdir -p $(dir $@)
 	topojson \
 		--id-property su_a3 \
 		-p name=NAME \
 		-p name \
 		-o $@ \
-		topo/subunits.json \
-		topo/places.json
+		topo/ne/subunits.json \
+		topo/ne/places.json
 
 # English Wards, from Office of National Statistics.
 ons/WD_DEC_2011_EW_BGC_shp.zip: 
@@ -82,7 +83,7 @@ shp/ons/WD_DEC_2011_EW_BGC.shp: ons/WD_DEC_2011_EW_BGC_shp.zip
 	mkdir -p $(dir $@) && unzip $< -d $(dir $@)
 	touch $@
 
-topo/ukwards.json: shp/ons/WD_DEC_2011_EW_BGC.shp
+topo/ons/ukwards.json: shp/ons/WD_DEC_2011_EW_BGC.shp
 	mkdir -p $(dir $@)
 	cd $(dir $<); \
 	ogr2ogr \
@@ -92,7 +93,7 @@ topo/ukwards.json: shp/ons/WD_DEC_2011_EW_BGC.shp
 		$(notdir $<); \
 	mv $(notdir $@) ../../$@
 
-topo/ukwards.topo.json: topo/ukwards.json
+topo/ons/ukwards.topo.json: topo/ons/ukwards.json
 	mkdir -p $(dir $@)
 	topojson \
 		-o $@ \
@@ -110,7 +111,7 @@ shp/ons/OA_2011_EW_BGC.shp: ons/Output_areas_(E+W)_2011_Boundaries_(Generalised_
 	mkdir -p $(dir $@) && unzip -u ons/Output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip -d $(dir $@)
 	touch $@
 
-topo/england_wales_oa_2011.json: shp/ons/OA_2011_EW_BGC.shp
+topo/ons/england_wales_oa_2011.json: shp/ons/OA_2011_EW_BGC.shp
 	mkdir -p $(dir $@)
 	cd $(dir $<); \
 	ogr2ogr \
@@ -120,7 +121,7 @@ topo/england_wales_oa_2011.json: shp/ons/OA_2011_EW_BGC.shp
 		$(notdir $<); \
 	mv $(notdir $@) ../../$@
 
-topo/england_wales_oa_2011.topo.json: topo/england_wales_oa_2011.json
+topo/ons/england_wales_oa_2011.topo.json: topo/ons/england_wales_oa_2011.json
 	mkdir -p $(dir $@)
 	topojson \
 		-o $@ \
@@ -135,10 +136,10 @@ ons/Lower_layer_super_output_areas_(E+W)_2011_Boundaries_(Generalised_Clipped).z
 	touch $(dir $@)/Lower_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip
 
 shp/ons/LSOA_2011_EW_BGC.shp: ons/Lower_layer_super_output_areas_(E+W)_2011_Boundaries_(Generalised_Clipped).zip
-	mkdir -p $(dir $@) && unzip ons/Lower_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip -d $(dir $@)
+	mkdir -p $(dir $@) && unzip -u ons/Lower_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip -d $(dir $@)
 	touch $@
 
-topo/england_wales_lsoa_2011.json: shp/ons/LSOA_2011_EW_BGC.shp
+topo/ons/england_wales_lsoa_2011.json: shp/ons/LSOA_2011_EW_BGC.shp
 	mkdir -p $(dir $@)
 	cd $(dir $<); \
 	ogr2ogr \
@@ -148,7 +149,7 @@ topo/england_wales_lsoa_2011.json: shp/ons/LSOA_2011_EW_BGC.shp
 		$(notdir $<); \
 	mv $(notdir $@) ../../$@
 
-topo/england_wales_lsoa_2011.topo.json: topo/england_wales_lsoa_2011.json
+topo/ons/england_wales_lsoa_2011.topo.json: topo/ons/england_wales_lsoa_2011.json
 	mkdir -p $(dir $@)
 	topojson \
 		-o $@ \
@@ -163,10 +164,10 @@ ons/Middle_layer_super_output_areas_(E+W)_2011_Boundaries_(Generalised_Clipped).
 	touch $(dir $@)/Middle_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip
 
 shp/ons/MSOA_2011_EW_BGC.shp: ons/Middle_layer_super_output_areas_(E+W)_2011_Boundaries_(Generalised_Clipped).zip
-	mkdir -p $(dir $@) && unzip ons/Middle_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip -d $(dir $@)
+	mkdir -p $(dir $@) && unzip -u ons/Middle_layer_super_output_areas_\(E+W\)_2011_Boundaries_\(Generalised_Clipped\).zip -d $(dir $@)
 	touch $@
 
-topo/england_wales_msoa_2011.json: shp/ons/MSOA_2011_EW_BGC.shp
+topo/ons/england_wales_msoa_2011.json: shp/ons/MSOA_2011_EW_BGC.shp
 	mkdir -p $(dir $@)
 	cd $(dir $<); \
 	ogr2ogr \
@@ -176,7 +177,7 @@ topo/england_wales_msoa_2011.json: shp/ons/MSOA_2011_EW_BGC.shp
 		$(notdir $<); \
 	mv $(notdir $@) ../../$@
 
-topo/england_wales_msoa_2011.topo.json: topo/england_wales_msoa_2011.json
+topo/ons/england_wales_msoa_2011.topo.json: topo/ons/england_wales_msoa_2011.json
 	mkdir -p $(dir $@)
 	topojson \
 		-o $@ \
@@ -194,7 +195,7 @@ shp/sns/DataZone_2001_bdry.shp: sns/SNS_Geography_14_3_2013.zip
 	mkdir -p $(dir $@) && unzip -u $< -d $(dir $@)
 	touch $@
 
-topo/scotland_datazone_2001.json: shp/sns/DataZone_2001_bdry.shp
+topo/sns/scotland_datazone_2001.json: shp/sns/DataZone_2001_bdry.shp
 	mkdir -p $(dir $@)
 	cd $(dir $<); \
 	ogr2ogr \
@@ -204,7 +205,7 @@ topo/scotland_datazone_2001.json: shp/sns/DataZone_2001_bdry.shp
 		$(notdir $<); \
 	mv $(notdir $@) ../../$@
 
-topo/scotland_datazone_2001.topo.json: topo/scotland_datazone_2001.json
+topo/sns/scotland_datazone_2001.topo.json: topo/sns/scotland_datazone_2001.json
 	mkdir -p $(dir $@)
 	topojson \
 		-o $@ \
@@ -215,10 +216,10 @@ topo/scotland_datazone_2001.topo.json: topo/scotland_datazone_2001.json
 
 # Scottish intermediate zones from Scottish Neighbourhood Statistics
 shp/sns/IntermediateZone_2001_bdry.shp: sns/SNS_Geography_14_3_2013.zip
-	mkdir -p $(dir $@) && unzip $< -d $(dir $@)
+	mkdir -p $(dir $@) && unzip -u $< -d $(dir $@)
 	touch $@
 
-topo/scotland_intermediatezone_2001.json: shp/sns/IntermediateZone_2001_bdry.shp
+topo/sns/scotland_intermediatezone_2001.json: shp/sns/IntermediateZone_2001_bdry.shp
 	mkdir -p $(dir $@)
 	cd $(dir $<); \
 	ogr2ogr \
@@ -228,7 +229,7 @@ topo/scotland_intermediatezone_2001.json: shp/sns/IntermediateZone_2001_bdry.shp
 		$(notdir $<); \
 	mv $(notdir $@) ../../$@
 
-topo/scotland_intermediatezone_2001.topo.json: topo/scotland_intermediatezone_2001.json
+topo/sns/scotland_intermediatezone_2001.topo.json: topo/sns/scotland_intermediatezone_2001.json
 	mkdir -p $(dir $@)
 	topojson \
 		-o $@ \
@@ -303,18 +304,13 @@ topo/geolytix/PostalDistrict_v2.topo.json: topo/geolytix/PostalDistrict_v2.json
 		--properties \
 		--simplify-proportion 0.2
 
-# Ordnance survey data manager
+# Ordnance survey data manager and shapefile -> geojson converter.
 os/%.zip: 
 	mkdir -p $(dir $@); \
 	echo "What is the full path of the directory where the $(notdir $@) file is found?"; \
 	read path; \
 	echo "Copying $(notdir $@) to $(dir $@)"; \
 	cp -pr $$path/$(notdir $@) $(dir $@)
-	touch $@
-
-# Boundary Line data from Ordnance survey
-shp/os/%.shp: os/bdline_gb.zip
-	mkdir -p $(dir $@) && unzip -u $< -d shp/$(dir @<)
 	touch $@
 
 topo/os/%.json: shp/os/%.shp
@@ -326,6 +322,11 @@ topo/os/%.json: shp/os/%.shp
 		$(notdir $@) \
 		$(notdir $<)
 	mv $(dir $<)/$(notdir $@) $@
+
+# Boundary Line data from Ordnance survey
+shp/os/bdline_gb/%.shp: os/bdline_gb.zip
+	mkdir -p shp/$(basename $<) && unzip -u $< -d shp/$(dir $<)
+	touch $@
 
 topo/os/bdline_gb/Data/county_region.topo.json: topo/os/bdline_gb/Data/county_region.json
 	mkdir -p $(dir $@)
@@ -416,18 +417,26 @@ topo/os/bdline_gb/Data/high_water_polyline.topo.json: topo/os/bdline_gb/Data/hig
 		--simplify-proportion 0.2
 
 # strtgi_essh_gb data from Ordnance survey
-shp/os/%.shp: os/strtgi_essh_gb.zip
-	mkdir -p $(dir $@) && unzip -u $< -d shp/$(dir @<)
+shp/os/strtgi_essh_gb/%.shp: os/strtgi_essh_gb.zip
+	mkdir -p shp/$(basename $<) && unzip -u $< -d shp/$(basename $<)
 	touch $@
+
+topo/os/strtgi_essh_gb/data/motorway.topo.json: topo/os/strtgi_essh_gb/data/motorway.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
 
 # Meridian 2 data from Ordnance survey
-shp/os/%.shp: os/merid2_essh_gb.zip
-	mkdir -p $(dir $@) && unzip -u $< -d shp/$(dir @<)
+shp/os/merid2_essh_gb/%.shp: os/merid2_essh_gb.zip
+	mkdir -p shp/$(basename $<) && unzip -u $< -d shp/$(basename $<)
 	touch $@
 
-# Terrain 50 data from Ordnance survey
-shp/os/%.shp: os/terr50_cesh_gb.zip
-	mkdir -p $(dir $@) && unzip -u $< -d shp/$(dir @<)
+# # Terrain 50 data from Ordnance survey
+shp/os/terr50_cesh_gb/%.shp: os/terr50_cesh_gb.zip
+	mkdir -p shp/$(basename $<) && unzip -u $< -d shp/$(basename $<)
 	touch $@
 
 # Sharegeo Green Belt.
