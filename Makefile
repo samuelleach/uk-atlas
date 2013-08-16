@@ -303,15 +303,16 @@ topo/geolytix/PostalDistrict_v2.topo.json: topo/geolytix/PostalDistrict_v2.json
 		--properties \
 		--simplify-proportion 0.2
 
-# Boundary Line data from Ordnance survey
-os/bdline_gb.zip: 
+# Ordnance survey data manager
+os/%.zip: 
 	mkdir -p $(dir $@); \
-	echo "What is the full path of the directory where the bdline_gp.zip file is found?"; \
+	echo "What is the full path of the directory where the $(notdir $@) file is found?"; \
 	read path; \
 	echo "Copying $(notdir $@) to $(dir $@)"; \
 	cp -pr $$path/$(notdir $@) $(dir $@)
 	touch $@
 
+# Boundary Line data from Ordnance survey
 shp/os/%.shp: os/bdline_gb.zip
 	mkdir -p $(dir $@) && unzip -u $< -d shp/$(dir @<)
 	touch $@
@@ -414,8 +415,22 @@ topo/os/bdline_gb/Data/high_water_polyline.topo.json: topo/os/bdline_gb/Data/hig
 		--properties \
 		--simplify-proportion 0.2
 
+# strtgi_essh_gb data from Ordnance survey
+shp/os/%.shp: os/strtgi_essh_gb.zip
+	mkdir -p $(dir $@) && unzip -u $< -d shp/$(dir @<)
+	touch $@
+
+# Meridian 2 data from Ordnance survey
+shp/os/%.shp: os/merid2_essh_gb.zip
+	mkdir -p $(dir $@) && unzip -u $< -d shp/$(dir @<)
+	touch $@
+
+# Terrain 50 data from Ordnance survey
+shp/os/%.shp: os/terr50_cesh_gb.zip
+	mkdir -p $(dir $@) && unzip -u $< -d shp/$(dir @<)
+	touch $@
+
 # Sharegeo Green Belt.
-# 10672/325/Green%20Belt%20England%202011.zip
 gz/sharegeo/Green%20Belt%20England%202011.zip: 
 	mkdir -p $(dir $@) && wget $(SHAREGEO)/10672/325/$(notdir $@) -O $@.download && mv $@.download $@
 	touch $@
