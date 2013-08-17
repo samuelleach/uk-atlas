@@ -7,6 +7,7 @@ ONS2=https://geoportal.statistics.gov.uk/Docs/Boundaries
 SNS=http://www.sns.gov.uk/BulkDownloads
 SHAREGEO=http://www.sharegeo.ac.uk/download
 EXTRACTOTRON=http://osm-extracted-metros.s3.amazonaws.com
+OSMPLANET=http://planet.openstreetmap.org
 
 OS_STRTGI_SHP = \
 		a_road b_road foreshor_region national_park rivers_line \
@@ -27,6 +28,9 @@ OS_MERIDIAN2_SHP = \
 
 SHAREGEO_SHP = \
 		GreenBelt2011 uk_police_force_areas fire_service_areas
+
+SHAREGEO_HEALTH_SHP = \
+		LHB_DEC_2011_WA_BFC PCO_DEC_2011_EN_BFC SHA_DEC_2011_EN_BFC
 
 all: topo/ne/uk.json \
 	topo/ons/ukwards.topo.json \
@@ -51,10 +55,11 @@ all: topo/ne/uk.json \
 	topo/os/bdline_gb/Data/high_water_polyline.topo.json \
 	$(addprefix topo/os/strtgi_essh_gb/data/, $(addsuffix .topo.json, $(OS_STRTGI_SHP))) \
 	$(addprefix topo/os/merid2_essh_gb/data/, $(addsuffix .topo.json, $(OS_MERIDIAN2_SHP))) \
-	$(addprefix topo/sharegeo/, $(addsuffix .topo.json, $(SHAREGEO_SHP)))
+	$(addprefix topo/sharegeo/, $(addsuffix .topo.json, $(SHAREGEO_SHP))) \
+	$(addprefix topo/sharegeo/MYDATA_121312/, $(addsuffix .topo.json, $(SHAREGEO_HEALTH_SHP)))
 
 clean:
-	rm -rf gz shp pbf topo ons sns os
+	rm -rf gz bz2 shp pbf topo ons sns os
 
 tidy:
 	rm -rf *.README.html *.VERSION.txt *.prj
@@ -471,13 +476,41 @@ topo/os/%.json: shp/os/%.shp
 		$(notdir $<)
 	mv $(dir $<)/$(notdir $@) $@
 
+
+# Share geo (ONS) Strategic Health Authorities (England), Primary Care Organisations (England), Local Health Boards (Wales)
+gz/sharegeo/Health%20Authority%20Boundaries%20for%20England%20and%20Wales.zip: 
+	mkdir -p $(dir $@) && wget $(SHAREGEO)/10672/333/$(notdir $@) -O $@.download && mv $@.download $@
+	touch $@
+
+shp/sharegeo/MYDATA_121312/%.shp: gz/sharegeo/Health%20Authority%20Boundaries%20for%20England%20and%20Wales.zip
+	rm -rf $(dir $@) && mkdir -p $(dir $@) && unzip -u $< -d shp/sharegeo
+	touch $(dir $@)/*
+
+topo/sharegeo/MYDATA_121312/%.topo.json: topo/sharegeo/MYDATA_121312/%.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
+
+topo/sharegeo/MYDATA_121312/%.json: shp/sharegeo/MYDATA_121312/%.shp
+	mkdir -p $(dir $@)
+	cd $(dir $<); \
+	ogr2ogr \
+		-t_srs "EPSG:4326" \
+		-f GEOJSON \
+		$(notdir $@) \
+		$(notdir $<)
+	mv $(dir $<)/$(notdir $@) $@
+
 # Sharegeo Green Belt.
 gz/sharegeo/Green%20Belt%20England%202011.zip: 
 	mkdir -p $(dir $@) && wget $(SHAREGEO)/10672/325/$(notdir $@) -O $@.download && mv $@.download $@
 	touch $@
 
 shp/sharegeo/GreenBelt2011.shp: gz/sharegeo/Green%20Belt%20England%202011.zip
-	rm -rf $(dir $@) && mkdir -p $(dir $@) && unzip $< -d $(dir $@)
+	rm -rf $(dir $@) && mkdir -p $(dir $@) && unzip -u $< -d $(dir $@)
 	touch $(dir $@)/*
 
 topo/sharegeo/%.json: shp/sharegeo/%.shp
@@ -504,7 +537,7 @@ gz/sharegeo/UK%20Police%20Force%20areas.zip:
 	touch $@
 
 shp/sharegeo/uk_police_force_areas.shp: gz/sharegeo/UK%20Police%20Force%20areas.zip
-	rm -rf $(dir $@) && mkdir -p $(dir $@) && unzip $< -d $(dir $@)
+	rm -rf $(dir $@) && mkdir -p $(dir $@) && unzip -u $< -d $(dir $@)
 	touch $(dir $@)/*
 
 topo/sharegeo/uk_police_force_areas.json: shp/sharegeo/uk_police_force_areas.shp
@@ -550,12 +583,6 @@ topo/sharegeo/fire_service_areas.topo.json: topo/sharegeo/fire_service_areas.jso
 		--properties \
 		--simplify-proportion 0.2
 
-
-# Share geo (ONS) Strategic Health Authorities (England), Primary Care Organisations (England), Local Health Boards (Wales)
-gz/sharegeo/Health%20Authority%20Boundaries%20for%20England%20and%20Wales.zip: 
-	mkdir -p $(dir $@) && wget $(SHAREGEO)/10672/333/$(notdir $@) -O $@.download && mv $@.download $@
-	touch $@
-
 # OSM extract of London from metro.teczno.com (Extractotron)
 pbf/extractotron/london.osm.pbf: 
 	mkdir -p $(dir $@) && wget $(EXTRACTOTRON)/$(notdir $@) -O $@.download && mv $@.download $@
@@ -569,5 +596,12 @@ topo/extractotron/london.osm.json: pbf/extractotron/london.osm.pbf
 		$(notdir $@) \
 		$(notdir $<)
 	mv $< $@
+
+# OSM Planet Coastline data
+bz2/osm/processed_p.tar.bz2:
+	mkdir -p $(dir $@) &&  wget $(OSMPLANET)/historical-shapefiles/processed_p.tar.bz2 -O $@.download && mv $@.download $@
+	touch $@
+
+# tar jxvf bz2/osm/processed_p.tar.bz2
 
 

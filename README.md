@@ -15,5 +15,6 @@ This Makefile can be used to download various UK shapefiles and convert them to 
 - OS Meridian 2 ("customisable for communication and topographical themes and route planning").
 - English Green Belt 2011 regions.
 - UK police force and fire service areas.
+- Primary Care Organisations, Strategic Health Authorities, Clinical Commissioning Groups.
 
-Run 'make all' to produce them.
+Run 'make all' to produce them. Required packages: topojson and ogr2ogr (gdal library).
