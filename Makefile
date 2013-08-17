@@ -510,7 +510,7 @@ gz/sharegeo/Green%20Belt%20England%202011.zip:
 	touch $@
 
 shp/sharegeo/GreenBelt2011.shp: gz/sharegeo/Green%20Belt%20England%202011.zip
-	rm -rf $(dir $@) && mkdir -p $(dir $@) && unzip -u $< -d $(dir $@)
+	mkdir -p $(dir $@) && unzip -u $< -d $(dir $@)
 	touch $(dir $@)/*
 
 topo/sharegeo/%.json: shp/sharegeo/%.shp
@@ -537,7 +537,7 @@ gz/sharegeo/UK%20Police%20Force%20areas.zip:
 	touch $@
 
 shp/sharegeo/uk_police_force_areas.shp: gz/sharegeo/UK%20Police%20Force%20areas.zip
-	rm -rf $(dir $@) && mkdir -p $(dir $@) && unzip -u $< -d $(dir $@)
+	mkdir -p $(dir $@) && unzip -u $< -d $(dir $@)
 	touch $(dir $@)/*
 
 topo/sharegeo/uk_police_force_areas.json: shp/sharegeo/uk_police_force_areas.shp
@@ -563,7 +563,7 @@ gz/sharegeo/UK%20Fire%20Service%20Areas.zip:
 	touch $@
 
 shp/sharegeo/Fire_Services_Areas/fire_service_areas.shp: gz/sharegeo/UK%20Fire%20Service%20Areas.zip
-	rm -rf $(dir $@) && unzip -u $< -d shp/sharegeo && mv shp/sharegeo/Fire\ Service\ Areas $(dir $@)
+	mkdir -p $(dir $@) && unzip -u $< -d shp/sharegeo && mv shp/sharegeo/Fire\ Service\ Areas $(dir $@)
 	touch $(dir $@)/*
 
 topo/sharegeo/fire_service_areas.json: shp/sharegeo/Fire_Services_Areas/fire_service_areas.shp
