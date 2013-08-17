@@ -6,6 +6,7 @@ GEOLYTIX=http://geolytix.co.uk/images
 ONS2=https://geoportal.statistics.gov.uk/Docs/Boundaries
 SNS=http://www.sns.gov.uk/BulkDownloads
 SHAREGEO=http://www.sharegeo.ac.uk/download
+EXTRACTOTRON=http://osm-extracted-metros.s3.amazonaws.com
 
 OS_STRTGI_SHP = \
 		a_road b_road foreshor_region national_park rivers_line \
@@ -25,7 +26,7 @@ OS_MERIDIAN2_SHP = \
 		# settlemt_point junction_font_point rndabout_point station_point text
 
 SHAREGEO_SHP = \
-		GreenBelt2011 uk_police_force_areas
+		GreenBelt2011 uk_police_force_areas fire_service_areas
 
 all: topo/ne/uk.json \
 	topo/ons/ukwards.topo.json \
@@ -53,7 +54,7 @@ all: topo/ne/uk.json \
 	$(addprefix topo/sharegeo/, $(addsuffix .topo.json, $(SHAREGEO_SHP)))
 
 clean:
-	rm -rf gz shp topo ons sns os
+	rm -rf gz shp pbf topo ons sns os
 
 tidy:
 	rm -rf *.README.html *.VERSION.txt *.prj
@@ -524,7 +525,6 @@ topo/sharegeo/uk_police_force_areas.topo.json: topo/sharegeo/uk_police_force_are
 		--simplify-proportion 0.2
 
 # Sharegeo UK Fire Service Areas
-# https://www.sharegeo.ac.uk/download/10672/368/UK%20Fire%20Service%20Areas.zip
 gz/sharegeo/UK%20Fire%20Service%20Areas.zip: 
 	mkdir -p $(dir $@) && wget $(SHAREGEO)/10672/368/$(notdir $@) -O $@.download && mv $@.download $@
 	touch $@
@@ -556,5 +556,18 @@ gz/sharegeo/Health%20Authority%20Boundaries%20for%20England%20and%20Wales.zip:
 	mkdir -p $(dir $@) && wget $(SHAREGEO)/10672/333/$(notdir $@) -O $@.download && mv $@.download $@
 	touch $@
 
+# OSM extract of London from metro.teczno.com (Extractotron)
+pbf/extractotron/london.osm.pbf: 
+	mkdir -p $(dir $@) && wget $(EXTRACTOTRON)/$(notdir $@) -O $@.download && mv $@.download $@
+	touch $@
+
+topo/extractotron/london.osm.json: pbf/extractotron/london.osm.pbf
+	mkdir -p $(dir $@)
+	cd $(dir $<); \
+	ogr2ogr \
+		-f GeoJSON \
+		$(notdir $@) \
+		$(notdir $<)
+	mv $< $@
 
 
