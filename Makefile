@@ -523,6 +523,34 @@ topo/sharegeo/uk_police_force_areas.topo.json: topo/sharegeo/uk_police_force_are
 		--properties \
 		--simplify-proportion 0.2
 
+# Sharegeo UK Fire Service Areas
+# https://www.sharegeo.ac.uk/download/10672/368/UK%20Fire%20Service%20Areas.zip
+gz/sharegeo/UK%20Fire%20Service%20Areas.zip: 
+	mkdir -p $(dir $@) && wget $(SHAREGEO)/10672/368/$(notdir $@) -O $@.download && mv $@.download $@
+	touch $@
+
+shp/sharegeo/Fire_Services_Areas/fire_service_areas.shp: gz/sharegeo/UK%20Fire%20Service%20Areas.zip
+	rm -rf $(dir $@) && unzip -u $< -d shp/sharegeo && mv shp/sharegeo/Fire\ Service\ Areas $(dir $@)
+	touch $(dir $@)/*
+
+topo/sharegeo/fire_service_areas.json: shp/sharegeo/Fire_Services_Areas/fire_service_areas.shp
+	mkdir -p $(dir $@)
+	cd $(dir $<); \
+	ogr2ogr \
+		-f GEOJSON \
+		$(notdir $@) \
+		$(notdir $<)
+	mv $(dir $<)/$(notdir $@) $@
+
+topo/sharegeo/fire_service_areas.topo.json: topo/sharegeo/fire_service_areas.json
+	mkdir -p $(dir $@)
+	topojson \
+		-o $@ \
+		$< \
+		--properties \
+		--simplify-proportion 0.2
+
+
 # Share geo (ONS) Strategic Health Authorities (England), Primary Care Organisations (England), Local Health Boards (Wales)
 gz/sharegeo/Health%20Authority%20Boundaries%20for%20England%20and%20Wales.zip: 
 	mkdir -p $(dir $@) && wget $(SHAREGEO)/10672/333/$(notdir $@) -O $@.download && mv $@.download $@
