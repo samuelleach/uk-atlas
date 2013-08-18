@@ -8,7 +8,9 @@ SNS=http://www.sns.gov.uk/BulkDownloads
 SHAREGEO=http://www.sharegeo.ac.uk/download
 EXTRACTOTRON=http://osm-extracted-metros.s3.amazonaws.com
 OSMPLANET=http://planet.openstreetmap.org
-
+NATURALENGLAND=http://www.gis.naturalengland.org.uk/pubs/gis/GIS_selection.asp # Further open data resources here
+# http://www.gis.naturalengland.org.uk/pubs/gis/GIS_Selection.asp?Type=2
+	
 OS_STRTGI_SHP = \
 		a_road b_road foreshor_region national_park rivers_line \
 		woodland_region admin_line coastline \
