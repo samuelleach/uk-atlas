@@ -38,10 +38,10 @@ all: topo/ne/uk.json \
 	topo/ons/ukwards.topo.json \
 	topo/geolytix/PostalArea.topo.json \
 	topo/geolytix/PostalDistrict.topo.json \
-	topo/ons/england_wales_oa_2011.topo.json \
-	topo/ons/england_wales_lsoa_2011.topo.json \
-	topo/ons/england_wales_msoa_2011.topo.json \
-	topo/sns/scotland_datazone_2001.topo.json \
+	# topo/ons/england_wales_oa_2011.topo.json \
+	# topo/ons/england_wales_lsoa_2011.topo.json \
+	# topo/ons/england_wales_msoa_2011.topo.json \
+	# topo/sns/scotland_datazone_2001.topo.json \
 	topo/sns/scotland_intermediatezone_2001.topo.json \
 	topo/os/bdline_gb/Data/county_region.topo.json \
 	topo/os/bdline_gb/Data/district_borough_unitary_region.topo.json \
