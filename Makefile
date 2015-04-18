@@ -2,7 +2,7 @@
 
 NATURALEARTH=http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural
 ONS=http://data.statistics.gov.uk/ONSGeography/CensusGeography/Boundaries/2011
-GEOLYTIX=http://geolytix.co.uk/images
+GEOLYTIX=http://geolytix.co.uk/downloads
 ONS2=https://geoportal.statistics.gov.uk/Docs/Boundaries
 SNS=http://www.sns.gov.uk/BulkDownloads
 SHAREGEO=http://www.sharegeo.ac.uk/download
@@ -270,12 +270,12 @@ topo/sns/scotland_intermediatezone_2001.topo.json: topo/sns/scotland_intermediat
 		--simplify-proportion 0.5
 
 # English and Scottish postal boundaries from Geolytix.
-gz/geolytix/PostalBoundariesSHP.zip: 
+gz/geolytix/PostalBoundariesOpen2012.zip: 
 	mkdir -p $(dir $@) && wget $(GEOLYTIX)/$(notdir $@) -O $@.download && mv $@.download $@
 	touch $@
 
-shp/geolytix/PostalBoundariesSHP/%.shp: gz/geolytix/PostalBoundariesSHP.zip
-	rm -rf $(dir $@) && mkdir -p $(dir $@) && unzip $< -d $(dir $@)
+shp/geolytix/PostalBoundariesSHP/%.shp: gz/geolytix/PostalBoundariesOpen2012.zip
+	rm -rf $(dir $@) && mkdir -p $(dir $@) && unzip $< -d $(dir $@) && unzip shp/geolytix/PostalBoundariesSHP/PostalBoundariesSHP.zip -d $(dir $@)
 	touch $(dir $@)/*
 
 topo/geolytix/PostalArea.json: shp/geolytix/PostalBoundariesSHP/PostalArea.shp
